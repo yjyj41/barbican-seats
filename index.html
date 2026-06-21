@@ -4,111 +4,145 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Barbican Hall — 내 좌석 기록</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0f1012; --panel:#17191c; --panel2:#1f2226; --line:#2c3036;
-    --ink:#f3f1ec; --muted:#9aa0a6; --gold:#e3b341; --teal:#36b3a8;
-    --visited:#e3b341; --selected:#ff7a59; --seat:#3a3f46; --seat-hover:#565d66;
-    --stage:#2a2d31;
+    --orange:#dc4905; --orange-d:#b93b03; --black:#000; --ink:#161514;
+    --paper:#ffffff; --paper2:#f4f1ec; --line:#e4ded5; --muted:#6f6a63;
+    --stalls:#e5006d; --circle:#0086cf; --balcony:#3aaa35;
+    --seat:#4a4f55; --seat-hover:#6b727b; --visited:var(--orange); --selected:#ffffff;
+    --stage:#222528;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;}
-  header{display:flex;align-items:center;justify-content:space-between;gap:16px;
-    padding:14px 22px;border-bottom:1px solid var(--line);position:sticky;top:0;
-    background:rgba(15,16,18,.92);backdrop-filter:blur(8px);z-index:20;flex-wrap:wrap}
-  .brand{display:flex;align-items:baseline;gap:12px}
-  .brand h1{font-size:18px;margin:0;letter-spacing:.04em;font-weight:800}
-  .brand span{color:var(--muted);font-size:12px;letter-spacing:.18em;text-transform:uppercase}
-  .stats{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
-  .stat{text-align:right}
-  .stat b{display:block;font-size:18px;color:var(--gold);font-weight:800}
-  .stat small{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.1em}
-  .tools{display:flex;gap:8px}
-  button.btn{background:var(--panel2);color:var(--ink);border:1px solid var(--line);
-    padding:8px 12px;border-radius:8px;cursor:pointer;font-size:13px}
-  button.btn:hover{background:#272b30;border-color:#3a4047}
-  button.btn.primary{background:var(--gold);color:#1a1500;border-color:var(--gold);font-weight:700}
-  button.btn.primary:hover{filter:brightness(1.05)}
-  main{display:grid;grid-template-columns:1fr 360px;gap:0;min-height:calc(100vh - 59px)}
-  .map-wrap{padding:18px 20px;overflow:auto}
-  .legend{display:flex;gap:18px;align-items:center;margin:4px 4px 12px;color:var(--muted);font-size:12px;flex-wrap:wrap}
-  .legend i{display:inline-block;width:13px;height:13px;border-radius:3px;margin-right:6px;vertical-align:-2px}
-  svg{width:100%;height:auto;display:block;max-width:1000px;margin:0 auto}
+  html,body{margin:0}
+  body{background:var(--black);color:var(--paper);
+    font-family:"Hanken Grotesk",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased}
+
+  /* ---------- 오렌지 헤더 바 ---------- */
+  header{background:var(--orange);display:flex;align-items:center;justify-content:space-between;
+    gap:16px;padding:16px 26px;position:sticky;top:0;z-index:30;flex-wrap:wrap}
+  .wordmark{display:flex;align-items:baseline;gap:14px}
+  .wordmark b{font-weight:800;font-size:26px;letter-spacing:-.02em;color:#fff;line-height:1}
+  .wordmark span{color:#ffd9c4;font-size:13px;font-weight:600;letter-spacing:.02em}
+  .tools{display:flex;gap:10px}
+  .pill{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.85);
+    padding:8px 16px;border-radius:40px;cursor:pointer;font-size:13px;font-weight:700;
+    font-family:inherit}
+  .pill:hover{background:#fff;color:var(--orange)}
+
+  /* ---------- 블랙 히어로 ---------- */
+  .hero{padding:30px 26px 26px;border-bottom:3px solid var(--orange)}
+  .eyebrow{color:var(--orange);font-weight:800;letter-spacing:.14em;font-size:13px;
+    text-transform:uppercase;margin:0 0 6px}
+  .hero h1{margin:0;font-weight:900;font-size:clamp(38px,6vw,72px);line-height:.92;
+    letter-spacing:-.02em;color:#fff}
+  .statstrip{display:flex;gap:42px;margin-top:24px;flex-wrap:wrap}
+  .stat b{display:block;font-size:34px;font-weight:900;color:var(--orange);line-height:1}
+  .stat small{color:#b9b4ad;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.1em}
+
+  /* ---------- 본문 2열 ---------- */
+  main{display:grid;grid-template-columns:1fr 380px;gap:0;align-items:start}
+  .map-wrap{padding:24px 22px 40px;overflow:auto}
+  .legend{display:flex;gap:20px;align-items:center;margin:0 4px 16px;color:#9b9690;
+    font-size:13px;font-weight:600;flex-wrap:wrap}
+  .legend i{display:inline-block;width:14px;height:14px;border-radius:3px;margin-right:7px;vertical-align:-2px}
+  .legend .hint{margin-left:auto;color:var(--orange);font-weight:700}
+  svg{width:100%;height:auto;display:block;max-width:1040px;margin:0 auto}
   .seat{cursor:pointer;transition:fill .08s}
   .seat:hover{fill:var(--seat-hover)}
   .seat.visited{fill:var(--visited)}
-  .seat.selected{stroke:var(--selected);stroke-width:2.4px}
-  .sec-label{fill:var(--muted);font-size:15px;font-weight:700;letter-spacing:.22em;text-transform:uppercase}
-  .row-label{fill:#6b7178;font-size:9px}
-  .stage-txt{fill:#8b9097;font-size:15px;letter-spacing:.34em;font-weight:700}
+  .seat.selected{stroke:var(--selected);stroke-width:2.6px}
+  .sec-label{font-size:17px;font-weight:900;letter-spacing:.18em;text-transform:uppercase}
+  .row-label{fill:#5a5f66;font-size:9px;font-weight:600}
+  .stage-txt{fill:#9aa0a6;font-size:15px;letter-spacing:.34em;font-weight:800}
 
-  aside{border-left:1px solid var(--line);background:var(--panel);
-    display:flex;flex-direction:column;max-height:calc(100vh - 59px);position:sticky;top:59px}
-  .aside-head{padding:16px 18px;border-bottom:1px solid var(--line)}
-  .aside-head h2{margin:0;font-size:16px}
-  .aside-head p{margin:4px 0 0;color:var(--muted);font-size:12px}
-  .aside-body{overflow:auto;padding:14px 18px;flex:1}
-  .empty{color:var(--muted);font-size:13px;text-align:center;margin-top:50px;line-height:1.6}
-  .visit{background:var(--panel2);border:1px solid var(--line);border-radius:10px;
-    padding:12px;margin-bottom:12px}
-  .visit .vtop{display:flex;justify-content:space-between;gap:8px}
-  .visit .vdate{font-weight:700;color:var(--gold);font-size:13px}
-  .visit .vprice{color:var(--teal);font-weight:700;font-size:13px;white-space:nowrap}
-  .visit .vconcert{margin:6px 0 0;font-size:14px;line-height:1.4}
-  .visit .vnotes{margin:6px 0 0;font-size:12px;color:var(--muted);line-height:1.5;white-space:pre-wrap}
-  .visit img{margin-top:10px;width:100%;border-radius:8px;display:block;cursor:zoom-in}
-  .visit .vdel{background:none;border:none;color:#7c8086;cursor:pointer;font-size:12px;padding:2px 4px}
-  .visit .vdel:hover{color:#ff7a59}
-  form.addv{margin-top:8px;border-top:1px dashed var(--line);padding-top:14px}
-  form.addv label{display:block;font-size:11px;color:var(--muted);margin:10px 0 4px;text-transform:uppercase;letter-spacing:.08em}
-  form.addv input,form.addv textarea{width:100%;background:var(--bg);border:1px solid var(--line);
-    color:var(--ink);border-radius:8px;padding:9px 10px;font-size:13px;font-family:inherit}
-  form.addv textarea{resize:vertical;min-height:54px}
+  /* ---------- 흰 사이드 패널 ---------- */
+  aside{background:var(--paper);color:var(--ink);min-height:calc(100vh - 0px);
+    border-left:3px solid var(--orange);display:flex;flex-direction:column}
+  .aside-head{padding:24px 22px 18px;border-bottom:1px solid var(--line)}
+  .aside-head .tag{display:inline-block;color:#fff;font-size:11px;font-weight:800;
+    letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:3px;margin-bottom:10px}
+  .aside-head h2{margin:0;font-size:24px;font-weight:900;letter-spacing:-.01em;line-height:1.05}
+  .aside-head p{margin:8px 0 0;color:var(--muted);font-size:13px;font-weight:500}
+  .aside-body{padding:18px 22px;flex:1}
+  .empty{color:var(--muted);font-size:14px;text-align:center;margin-top:46px;line-height:1.7;font-weight:500}
+  .empty .big{font-size:40px;display:block;margin-bottom:10px}
+
+  .visit{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px;background:var(--paper)}
+  .visit .vtop{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+  .visit .vdate{font-weight:800;font-size:14px;color:var(--ink)}
+  .visit .vprice{color:var(--orange);font-weight:900;font-size:15px;white-space:nowrap}
+  .visit .vconcert{margin:8px 0 0;font-size:16px;font-weight:700;line-height:1.3}
+  .visit .vnotes{margin:7px 0 0;font-size:13px;color:var(--muted);line-height:1.55;white-space:pre-wrap;font-weight:500}
+  .visit img{margin-top:12px;width:100%;border-radius:10px;display:block;cursor:zoom-in}
+  .visit .vdel{background:none;border:none;color:#a39c93;cursor:pointer;font-size:12px;
+    padding:2px 4px;font-weight:600;font-family:inherit}
+  .visit .vdel:hover{color:var(--stalls)}
+
+  form.addv{margin-top:6px;border-top:2px dashed var(--line);padding-top:18px}
+  form.addv .ftitle{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;
+    color:var(--orange);margin-bottom:6px}
+  form.addv label{display:block;font-size:11px;color:var(--muted);margin:12px 0 5px;
+    text-transform:uppercase;letter-spacing:.07em;font-weight:700}
+  form.addv input,form.addv textarea{width:100%;background:var(--paper2);border:1px solid var(--line);
+    color:var(--ink);border-radius:9px;padding:10px 11px;font-size:14px;font-family:inherit;font-weight:500}
+  form.addv input:focus,form.addv textarea:focus{outline:2px solid var(--orange);border-color:transparent}
+  form.addv textarea{resize:vertical;min-height:58px}
   .file-row{display:flex;align-items:center;gap:10px;margin-top:6px}
-  .thumb{width:54px;height:54px;border-radius:8px;object-fit:cover;border:1px solid var(--line)}
-  footer{padding:10px 18px;border-top:1px solid var(--line);color:#6b7178;font-size:11px;text-align:center}
-  .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);display:none;align-items:center;
-    justify-content:center;z-index:50;cursor:zoom-out}
-  .lightbox img{max-width:92vw;max-height:92vh;border-radius:8px}
-  @media(max-width:880px){main{grid-template-columns:1fr}aside{position:static;max-height:none;border-left:none;border-top:1px solid var(--line)}}
+  .thumb{width:56px;height:56px;border-radius:9px;object-fit:cover;border:1px solid var(--line)}
+  .btn-add{margin-top:18px;width:100%;background:var(--orange);color:#fff;border:none;
+    padding:13px;border-radius:40px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit}
+  .btn-add:hover{background:var(--orange-d)}
+
+  footer{padding:14px 22px;color:#8d877f;font-size:11px;text-align:center;font-weight:500}
+  .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;align-items:center;
+    justify-content:center;z-index:60;cursor:zoom-out}
+  .lightbox img{max-width:92vw;max-height:92vh;border-radius:10px}
+  @media(max-width:900px){main{grid-template-columns:1fr}aside{border-left:none;border-top:3px solid var(--orange);min-height:0}}
 </style>
 </head>
 <body>
 <header>
-  <div class="brand">
-    <h1>BARBICAN HALL</h1><span>내 좌석 기록</span>
+  <div class="wordmark"><b>barbican</b><span>내 좌석 기록 · seat log</span></div>
+  <div class="tools">
+    <button class="pill" id="btn-export">내보내기</button>
+    <button class="pill" id="btn-import">가져오기</button>
+    <input type="file" id="file-import" accept="application/json" hidden>
   </div>
-  <div class="stats">
+</header>
+
+<section class="hero">
+  <p class="eyebrow">My concert seats</p>
+  <h1>Barbican Hall</h1>
+  <div class="statstrip">
     <div class="stat"><b id="st-visits">0</b><small>관람 기록</small></div>
     <div class="stat"><b id="st-seats">0</b><small>앉아본 좌석</small></div>
     <div class="stat"><b id="st-spent">£0</b><small>총 지출</small></div>
-    <div class="tools">
-      <button class="btn" id="btn-export">내보내기</button>
-      <button class="btn" id="btn-import">가져오기</button>
-      <input type="file" id="file-import" accept="application/json" hidden>
-    </div>
   </div>
-</header>
+</section>
 
 <main>
   <div class="map-wrap">
     <div class="legend">
       <span><i style="background:var(--seat)"></i>미방문</span>
-      <span><i style="background:var(--visited)"></i>앉아본 좌석</span>
-      <span><i style="background:none;border:2px solid var(--selected)"></i>선택됨</span>
-      <span style="margin-left:auto">좌석을 클릭해 기록을 추가하세요</span>
+      <span><i style="background:var(--orange)"></i>앉아본 좌석</span>
+      <span><i style="background:none;border:2px solid #fff"></i>선택됨</span>
+      <span class="hint">좌석을 클릭해 기록을 추가하세요 →</span>
     </div>
     <svg id="hall" viewBox="0 0 1000 820" role="img" aria-label="Barbican Hall seating map"></svg>
   </div>
 
   <aside>
     <div class="aside-head">
+      <span class="tag" id="seat-tag" style="display:none"></span>
       <h2 id="seat-title">좌석을 선택하세요</h2>
       <p id="seat-sub">평면도에서 좌석을 클릭하면 여기에 기록이 표시됩니다.</p>
     </div>
     <div class="aside-body" id="aside-body">
-      <div class="empty">🎻<br>아직 선택된 좌석이 없습니다.<br>왼쪽 평면도에서 좌석을 눌러보세요.</div>
+      <div class="empty"><span class="big">🎻</span>아직 선택된 좌석이 없습니다.<br>왼쪽 평면도에서 좌석을 눌러보세요.</div>
     </div>
     <footer>데이터는 이 브라우저에만 저장됩니다 · 정기적으로 ‘내보내기’로 백업하세요</footer>
   </aside>
@@ -123,8 +157,10 @@ let DB=load();
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}}
 function save(){localStorage.setItem(KEY,JSON.stringify(DB));renderStats();paintSeats()}
 
-//================ 좌석 배치 정의 (양식화된 Barbican Hall) ================
-// 각 섹션: 이름, 시작 y, 행 라벨, 행별 좌석 수, 곡률
+//================ 섹션 색상 (바비칸 카테고리 태그 느낌) ================
+const SEC_COLOR={Stalls:"var(--stalls)",Circle:"var(--circle)",Balcony:"var(--balcony)"};
+
+//================ 좌석 배치 (양식화된 Barbican Hall) ================
 const SECTIONS=[
   {id:"Stalls", label:"STALLS", y0:150, rowH:21, curve:0.022,
    rows:[28,30,30,32,32,34,34,36,36,38,38,40,40,42,42,42]},
@@ -139,19 +175,15 @@ const ROWALPHA="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 function buildSVG(){
   const svg=document.getElementById("hall");
   let out="";
-  // 무대
-  out+=`<polygon points="380,40 620,40 660,108 340,108" fill="var(--stage)" stroke="var(--line)"/>`;
+  out+=`<polygon points="380,40 620,40 660,108 340,108" fill="var(--stage)" stroke="#33373b"/>`;
   out+=`<text x="500" y="82" text-anchor="middle" class="stage-txt">STAGE</text>`;
-
   SECTIONS.forEach(sec=>{
-    // 섹션 라벨
-    out+=`<text x="40" y="${sec.y0-14}" class="sec-label">${sec.label}</text>`;
+    out+=`<text x="40" y="${sec.y0-14}" class="sec-label" fill="${SEC_COLOR[sec.id]}">${sec.label}</text>`;
     sec.rows.forEach((n,ri)=>{
       const rowLabel=ROWALPHA[ri]||("R"+ri);
       const rowW=n*SEAT_W+(n-1)*SEAT_GAP;
       const startX=CX-rowW/2;
       const baseY=sec.y0+ri*sec.rowH;
-      // 행 라벨(양끝)
       out+=`<text x="${startX-12}" y="${baseY+11}" text-anchor="end" class="row-label">${rowLabel}</text>`;
       for(let s=0;s<n;s++){
         const x=startX+s*(SEAT_W+SEAT_GAP);
@@ -167,7 +199,6 @@ function buildSVG(){
   svg.querySelectorAll(".seat").forEach(r=>r.addEventListener("click",()=>selectSeat(r.dataset.id)));
 }
 
-//================ 좌석 상태 색칠 ================
 function paintSeats(){
   document.querySelectorAll(".seat").forEach(r=>{
     const has=DB[r.dataset.id]&&DB[r.dataset.id].length;
@@ -176,7 +207,6 @@ function paintSeats(){
   });
 }
 
-//================ 통계 ================
 function renderStats(){
   let visits=0,seats=0,spent=0;
   for(const id in DB){const a=DB[id];if(a&&a.length){seats++;visits+=a.length;
@@ -188,17 +218,26 @@ function renderStats(){
 
 //================ 좌석 선택 & 사이드패널 ================
 let CURRENT=null;
-function selectSeat(id){
-  CURRENT=id; paintSeats(); renderAside();
-}
-function seatLabel(id){const[se,ro,nu]=id.split("-");return `${se} · ${ro}열 ${nu}번`;}
+function selectSeat(id){CURRENT=id;paintSeats();renderAside();}
+function seatParts(id){const[se,ro,nu]=id.split("-");return{se,ro,nu};}
 
 function renderAside(){
   const body=document.getElementById("aside-body");
   const title=document.getElementById("seat-title");
   const sub=document.getElementById("seat-sub");
-  if(!CURRENT){body.innerHTML='<div class="empty">🎻<br>좌석을 선택하세요.</div>';return;}
-  title.textContent=seatLabel(CURRENT);
+  const tag=document.getElementById("seat-tag");
+  if(!CURRENT){
+    tag.style.display="none";
+    title.textContent="좌석을 선택하세요";
+    sub.textContent="평면도에서 좌석을 클릭하면 여기에 기록이 표시됩니다.";
+    body.innerHTML='<div class="empty"><span class="big">🎻</span>아직 선택된 좌석이 없습니다.<br>왼쪽 평면도에서 좌석을 눌러보세요.</div>';
+    return;
+  }
+  const{se,ro,nu}=seatParts(CURRENT);
+  tag.style.display="inline-block";
+  tag.textContent=se;
+  tag.style.background=SEC_COLOR[se]||"var(--orange)";
+  title.textContent=`${ro}열 ${nu}번`;
   const list=DB[CURRENT]||[];
   sub.textContent=list.length?`${list.length}번 관람한 좌석`:"아직 기록이 없습니다";
 
@@ -227,6 +266,7 @@ function renderAside(){
 function formHTML(){
   const today=new Date().toISOString().slice(0,10);
   return `<form class="addv" id="addv">
+    <div class="ftitle">＋ 새 기록 추가</div>
     <label>관람 날짜</label><input type="date" name="date" value="${today}">
     <label>티켓 가격 (£)</label><input type="number" name="price" step="0.01" min="0" placeholder="예: 35">
     <label>공연 / 프로그램</label><input type="text" name="concert" placeholder="예: LSO — Mahler 5, Rattle 지휘">
@@ -236,7 +276,7 @@ function formHTML(){
       <input type="file" name="photo" accept="image/*">
       <img class="thumb" id="thumb" style="display:none">
     </div>
-    <button type="submit" class="btn primary" style="margin-top:14px;width:100%">＋ 기록 추가</button>
+    <button type="submit" class="btn-add">기록 추가</button>
   </form>`;
 }
 
@@ -260,7 +300,6 @@ function wireForm(){
   });
 }
 
-// 이미지 축소(최대 1000px, JPEG) — 저장 용량 절약
 function shrink(file){return new Promise(res=>{
   const img=new Image();const fr=new FileReader();
   fr.onload=()=>{img.onload=()=>{
@@ -293,7 +332,7 @@ document.getElementById("file-import").addEventListener("change",e=>{
     }else{DB=d;}
     save();renderAside();alert("가져오기 완료!");
   }catch(err){alert("올바른 JSON 파일이 아닙니다.");}};
-  fr.readAsDataURL?fr.readAsText(file):fr.readAsText(file);
+  fr.readAsText(file);
 });
 
 //================ 시작 ================
